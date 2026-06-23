@@ -34,13 +34,13 @@ def load_config():
 
 def load_state():
     if os.path.exists(STATE_FILE):
-        with open(STATE_FILE) as f:
+        with open(STATE_FILE, encoding="utf-8-sig") as f:
             return json.load(f)
     return {"last_id": 0}
 
 
 def save_state(state):
-    with open(STATE_FILE, "w") as f:
+    with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump(state, f)
 
 
