@@ -456,6 +456,24 @@ def log_entry():
     return jsonify(ok=True)
 
 
+@app.route("/seed_investors", methods=["POST"])
+def seed_investors():
+    data = request.get_json()
+    names = data.get("names", [])
+    if not names:
+        return jsonify(ok=False, error="Nenhum nome enviado")
+    conn = get_db()
+    added = 0
+    for nome in names:
+        nome = nome.strip()
+        if nome:
+            cur = conn.execute("INSERT OR IGNORE INTO investidores (nome) VALUES (?)", (nome,))
+            added += cur.rowcount
+    conn.commit()
+    conn.close()
+    return jsonify(ok=True, added=added)
+
+
 @app.route("/export")
 def export():
     since_id = int(request.args.get("since_id", 0))

@@ -81,6 +81,29 @@ def main():
     state = load_state()
     url   = cfg["url"].rstrip("/")
 
+    # Envia investidores locais para a nuvem (para o autocomplete funcionar)
+    print("\nSincronizando lista de investidores para a nuvem...")
+    local_investors = []
+    if os.path.exists(EXCEL_FILE):
+        wb_read = openpyxl.load_workbook(EXCEL_FILE, data_only=True)
+        ws_tab  = wb_read["Tabela"]
+        for row in ws_tab.iter_rows(min_row=28, values_only=True):
+            val = row[1]
+            if val and isinstance(val, str) and val.strip():
+                local_investors.append(val.strip())
+    if local_investors:
+        try:
+            resp_seed = requests.post(
+                f"{url}/seed_investors",
+                json={"names": local_investors},
+                timeout=15,
+            )
+            result = resp_seed.json()
+            if result.get("added", 0) > 0:
+                print(f"  {result['added']} investidor(es) novo(s) enviado(s) para a nuvem.")
+        except Exception as e:
+            print(f"  Aviso: não foi possível sincronizar investidores: {e}")
+
     print(f"\nBuscando entradas novas (desde id={state['last_id']})...")
 
     try:
