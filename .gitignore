@@ -1,0 +1,8 @@
+*.xlsx
+*.xls
+logs.db
+sync_state.json
+__pycache__/
+*.pyc
+server.log
+server.err
